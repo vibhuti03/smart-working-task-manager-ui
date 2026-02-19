@@ -24,6 +24,19 @@ export const addTask = async (task) => {
   return res.json();
 };
 
+export const updateTask = async (task) => {
+  const res = await fetch(`${BASE_URL}/update-task`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(task),
+  });
+
+  return res.json();
+};
+
+
 export const updateTaskStatus = async (id, status) => {
   const res = await fetch(`${BASE_URL}/update-task-status?id=${id}&newStatus=${status}`, {
     method: "POST"
@@ -35,6 +48,5 @@ export const deleteTask = async (id) => {
   const res = await fetch(`${BASE_URL}/delete-task?id=${id}`, {
     method: "DELETE",
   });
-
   return res.text();
 };

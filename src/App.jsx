@@ -1,23 +1,33 @@
 import { useEffect, useState } from "react";
-import { getAllTasks, getTaskDetails, addTask, updateTaskStatus, deleteTask } from "./services/taskService";
-
+import {
+  getAllTasks,
+  getTaskDetails,
+  addTask,
+  updateTask,
+  updateTaskStatus,
+  deleteTask,
+} from "./services/taskService";
 
 function App() {
   const [taskList, setTasks] = useState([]);
   const [showForm, setShowForm] = useState(false);
-  const [newTask, setNewTask] = useState({
-      title: "",
-      description: "",
-      dueDate: "",
-    });
+  const [isEditMode, setIsEditMode] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
 
+  const [newTask, setNewTask] = useState({
+    title: "",
+    description: "",
+    dueDate: "",
+  });
+
+  // ✅ Load tasks
   useEffect(() => {
     getAllTasks()
       .then((data) => setTasks(data.taskList || []))
       .catch((err) => console.error(err));
   }, []);
 
+  // ✅ Handle input
   const handleChange = (e) => {
     setNewTask({
       ...newTask,
@@ -25,6 +35,7 @@ function App() {
     });
   };
 
+  // ✅ ADD TASK
   const handleAddTask = async () => {
     try {
       const payload = {
@@ -33,44 +44,76 @@ function App() {
         dueDate: newTask.dueDate + ":00",
       };
 
-      const createdTask = await addTask(payload);
+      const created = await addTask(payload);
+      setTasks((prev) => [...prev, created]);
 
-      setTasks((prev) => [...prev, createdTask]);
-
-      setNewTask({
-        title: "",
-        description: "",
-        dueDate: "",
-      });
-
-      setShowForm(false); // ✅ CLOSE FORM
+      setNewTask({ title: "", description: "", dueDate: "" });
+      setShowForm(false);
 
     } catch (err) {
       console.error(err);
     }
   };
 
+  // ✅ UPDATE TASK
+  const handleUpdateTask = async () => {
+    try {
+      const payload = {
+        id: selectedTask.id,
+        title: newTask.title,
+        description: newTask.description,
+        dueDate: newTask.dueDate + ":00",
+        isCompleted: selectedTask.completed,
+      };
 
+      console.log("UPDATE PAYLOAD:", payload);
+
+      const updated = await updateTask(payload);
+
+      setTasks((prev) =>
+        prev.map((t) =>
+          t.id === selectedTask.id ? { ...t, ...updated } : t
+        )
+      );
+
+      setSelectedTask(updated);
+
+      setNewTask({ title: "", description: "", dueDate: "" });
+      setShowForm(false);
+      setIsEditMode(false);
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // ✅ SELECT TASK
   const handleSelect = (id) => {
+    if (showForm) return;
+
     getTaskDetails(id)
-      .then((data) => setSelectedTask(data))
+      .then((data) =>
+        setSelectedTask({
+          ...data,
+          completed: data.completed ?? data.isCompleted,
+        })
+      )
       .catch((err) => console.error(err));
   };
 
+  // ✅ TOGGLE STATUS
   const handleToggle = async (id, currentStatus) => {
     const newStatus = !currentStatus;
 
     try {
       await updateTaskStatus(id, newStatus);
 
-      // ✅ Update UI instantly (no refetch)
       setTasks((prev) =>
         prev.map((task) =>
           task.id === id ? { ...task, completed: newStatus } : task
         )
       );
 
-      // update selected task too (if same)
       if (selectedTask?.id === id) {
         setSelectedTask({ ...selectedTask, completed: newStatus });
       }
@@ -80,22 +123,25 @@ function App() {
     }
   };
 
+  // ✅ DELETE
   const handleDelete = async () => {
     if (!selectedTask) return;
 
     try {
       await deleteTask(selectedTask.id);
 
-      // remove from UI
-      setTasks((prev) => prev.filter((t) => t.id !== selectedTask.id));
+      setTasks((prev) =>
+        prev.filter((t) => t.id !== selectedTask.id)
+      );
 
-      // clear selection
       setSelectedTask(null);
 
     } catch (err) {
       console.error(err);
     }
   };
+
+  // styles
   const thStyle = {
     border: "1px solid #ddd",
     padding: "10px",
@@ -107,16 +153,19 @@ function App() {
     padding: "10px",
   };
 
-
   return (
     <div style={{ padding: "20px" }}>
       <h1>Tasks</h1>
+
+      {/* ✅ Add Button */}
       <button onClick={() => setShowForm(true)}>
         Add New Task
       </button>
+
+      {/* ✅ FORM */}
       {showForm && (
         <div style={{ margin: "20px 0", border: "1px solid #ccc", padding: "15px" }}>
-          <h3>Add Task</h3>
+          <h3>{isEditMode ? "Edit Task" : "Add Task"}</h3>
 
           <input
             type="text"
@@ -144,14 +193,17 @@ function App() {
           />
 
           <button
-            onClick={handleAddTask}
+            onClick={isEditMode ? handleUpdateTask : handleAddTask}
             style={{ marginLeft: "10px" }}
           >
-            Save
+            {isEditMode ? "Update" : "Save"}
           </button>
 
           <button
-            onClick={() => setShowForm(false)}
+            onClick={() => {
+              setShowForm(false);
+              setIsEditMode(false);
+            }}
             style={{ marginLeft: "10px" }}
           >
             Cancel
@@ -159,13 +211,8 @@ function App() {
         </div>
       )}
 
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          marginTop: "20px",
-        }}
-      >
+      {/* ✅ TABLE */}
+      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}>
         <thead>
           <tr style={{ backgroundColor: "#f5f5f5" }}>
             <th style={thStyle}>Title</th>
@@ -191,15 +238,13 @@ function App() {
                   ? new Date(task.dueDate).toLocaleString()
                   : "N/A"}
               </td>
-              <td style={tdStyle}>
+              <td style={tdStyle} onClick={(e) => e.stopPropagation()}>
                 <input
                   type="checkbox"
                   checked={task.completed}
-                  onClick={(e) => e.stopPropagation()}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    handleToggle(task.id, task.completed);
-                  }}
+                  onChange={() =>
+                    handleToggle(task.id, task.completed)
+                  }
                 />
               </td>
             </tr>
@@ -207,31 +252,45 @@ function App() {
         </tbody>
       </table>
 
-
+      {/* ✅ DETAILS */}
       {selectedTask && (
-      <div style={{ marginTop: "20px" }}>
-        <h2>Task Details</h2>
+        <div style={{ marginTop: "20px" }}>
+          <h2>Task Details</h2>
 
-        <p><b>Title:</b> {selectedTask.title}</p>
-        <p><b>Description:</b> {selectedTask.description || "N/A"}</p>
-        <p><b>Completed:</b> {selectedTask.completed ? "✅" : "❌"}</p>
-        <p><b>Due:</b> {new Date(selectedTask.dueDate).toLocaleString()}</p>
+          <p><b>Title:</b> {selectedTask.title}</p>
+          <p><b>Description:</b> {selectedTask.description || "N/A"}</p>
+          <p><b>Completed:</b> {selectedTask.completed ? "✅" : "❌"}</p>
+          <p><b>Due:</b> {new Date(selectedTask.dueDate).toLocaleString()}</p>
 
-        <button
-          onClick={handleDelete}
-          style={{
-            marginTop: "10px",
-            padding: "8px 12px",
-            backgroundColor: "red",
-            color: "white",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Delete Task
-        </button>
-      </div>
-    )}
+          <button
+            onClick={() => {
+              setNewTask({
+                title: selectedTask.title,
+                description: selectedTask.description || "",
+                dueDate: selectedTask.dueDate?.slice(0, 16),
+              });
+              setIsEditMode(true);
+              setShowForm(true);
+            }}
+            style={{ marginRight: "10px" }}
+          >
+            Edit
+          </button>
+
+          <button
+            onClick={handleDelete}
+            style={{
+              padding: "8px 12px",
+              backgroundColor: "red",
+              color: "white",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Delete Task
+          </button>
+        </div>
+      )}
     </div>
   );
 }
