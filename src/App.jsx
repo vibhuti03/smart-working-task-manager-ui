@@ -20,14 +20,12 @@ function App() {
     dueDate: "",
   });
 
-  // ✅ Load tasks
   useEffect(() => {
     getAllTasks()
       .then((data) => setTasks(data.taskList || []))
       .catch((err) => console.error(err));
   }, []);
 
-  // ✅ Handle input
   const handleChange = (e) => {
     setNewTask({
       ...newTask,
@@ -35,7 +33,6 @@ function App() {
     });
   };
 
-  // ✅ ADD TASK
   const handleAddTask = async () => {
     try {
       const payload = {
@@ -55,7 +52,6 @@ function App() {
     }
   };
 
-  // ✅ UPDATE TASK
   const handleUpdateTask = async () => {
     try {
       const payload = {
@@ -87,7 +83,6 @@ function App() {
     }
   };
 
-  // ✅ SELECT TASK
   const handleSelect = (id) => {
     if (showForm) return;
 
@@ -101,7 +96,6 @@ function App() {
       .catch((err) => console.error(err));
   };
 
-  // ✅ TOGGLE STATUS
   const handleToggle = async (id, currentStatus) => {
     const newStatus = !currentStatus;
 
@@ -123,7 +117,6 @@ function App() {
     }
   };
 
-  // ✅ DELETE
   const handleDelete = async () => {
     if (!selectedTask) return;
 
@@ -141,7 +134,6 @@ function App() {
     }
   };
 
-  // styles
   const thStyle = {
     border: "1px solid #ddd",
     padding: "10px",
@@ -157,12 +149,10 @@ function App() {
     <div style={{ padding: "20px" }}>
       <h1>Tasks</h1>
 
-      {/* ✅ Add Button */}
       <button onClick={() => setShowForm(true)}>
         Add New Task
       </button>
 
-      {/* ✅ FORM */}
       {showForm && (
         <div style={{ margin: "20px 0", border: "1px solid #ccc", padding: "15px" }}>
           <h3>{isEditMode ? "Edit Task" : "Add Task"}</h3>
@@ -211,7 +201,6 @@ function App() {
         </div>
       )}
 
-      {/* ✅ TABLE */}
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "20px" }}>
         <thead>
           <tr style={{ backgroundColor: "#f5f5f5" }}>
@@ -252,7 +241,6 @@ function App() {
         </tbody>
       </table>
 
-      {/* ✅ DETAILS */}
       {selectedTask && (
         <div style={{ marginTop: "20px" }}>
           <h2>Task Details</h2>
