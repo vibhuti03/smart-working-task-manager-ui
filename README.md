@@ -1,16 +1,119 @@
-# React + Vite
+# 📝 Task Manager (React + Spring Boot)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple full-stack Task Manager application with CRUD functionality.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## React Compiler
+* ✅ View all tasks
+* ✅ Select and view task details
+* ✅ Add new tasks
+* ✅ Edit existing tasks
+* ✅ Toggle task completion
+* ✅ Delete tasks
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**Frontend**
+
+* React (Vite)
+* JavaScript
+* Fetch API
+
+**Backend**
+
+* Spring Boot
+* Spring Web MVC
+* JPA / Hibernate
+* MySQL (or any DB)
+
+---
+
+## 📦 Project Setup
+
+## Backend Requirements
+
+After cloning the backend repo and basic setup,
+<br> 
+(In detail here https://github.com/vibhuti03/smart-working-task-management-application)
+
+```bash
+./mvnw spring-boot:run
+```
+
+OR (if using Maven installed):
+
+```bash
+mvn spring-boot:run
+```
+
+Backend will start at:
+
+```
+http://localhost:8080
+```
+
+---
+
+## 💻 Frontend Setup (React)
+### 🔹 1. Clone the repository
+
+```bash
+git clone https://github.com/vibhuti03/smart-working-task-manager-ui
+cd smart-working-task-manager-ui
+```
+
+---
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+---
+
+
+### 3. Start the app
+
+```bash
+npm run dev
+```
+
+Frontend will run at:
+
+```
+http://localhost:5173
+```
+
+---
+
+## 🧪 Running Tests
+
+```bash
+npm test
+```
+
+---
+
+## 🧠 Future Improvements
+
+* Add authentication
+* Use Redux / Context API
+* Improve UI with Tailwind / Material UI
+* Add pagination & filtering
+
+---
+
+## 👨‍💻 Author
+
+Vibhuti Maheshwari
+
+---
+
+## ⭐ If you like this project
+
+Give it a star ⭐ on GitHub!
